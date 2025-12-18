@@ -10,6 +10,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "notifi.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "app.js",
       "use": "@vercel/static"
     },
@@ -21,6 +25,10 @@
   "routes": [
     {
       "src": "/api/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/notifi",
       "dest": "server.js"
     },
     {

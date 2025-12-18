@@ -296,6 +296,11 @@ app.get('/api/subscriptions', (req, res) => {
     });
 });
 
+// Serve the broadcast notification admin page
+app.get('/notifi', (req, res) => {
+    res.sendFile(path.join(__dirname, 'notifi.html'));
+});
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({

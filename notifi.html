@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broadcast Push Notifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .history {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .history h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .history-time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .refresh-btn {
+            background: #6c757d;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            width: auto;
+            display: inline-block;
+        }
+
+        .icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="icon">📢</div>
+            <h1>Broadcast Notifications</h1>
+            <p class="subtitle">Send push notifications to all subscribed devices</p>
+
+            <div id="statusMessage" class="status-message"></div>
+
+            <div class="stats">
+                <div class="stats-number" id="subscriberCount">-</div>
+                <div class="stats-label">Active Subscribers</div>
+            </div>
+
+            <button id="refreshBtn" class="btn refresh-btn">🔄 Refresh Count</button>
+
+            <form id="broadcastForm">
+                <div class="form-group">
+                    <label for="title">Notification Title</label>
+                    <input type="text" id="title" placeholder="e.g., New Update Available!" required>
+                    <p class="help-text">Short, attention-grabbing title</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" placeholder="Enter your notification message here..." required></textarea>
+                    <p class="help-text">Will be spoken aloud on devices with text-to-speech</p>
+                </div>
+
+                <button type="submit" id="sendBtn" class="btn">📤 Send to All Devices</button>
+            </form>
+
+            <div class="history">
+                <h3>Recent Broadcasts</h3>
+                <div id="historyList">
+                    <p class="help-text">No broadcasts sent yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statusMessage = document.getElementById('statusMessage');
+        const subscriberCount = document.getElementById('subscriberCount');
+        const broadcastForm = document.getElementById('broadcastForm');
+        const sendBtn = document.getElementById('sendBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const historyList = document.getElementById('historyList');
+        const titleInput = document.getElementById('title');
+        const messageInput = document.getElementById('message');
+
+        let history = [];
+
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        async function refreshSubscriberCount() {
+            try {
+                const response = await fetch('/api/subscriptions');
+                const data = await response.json();
+                subscriberCount.textContent = data.count || 0;
+            } catch (error) {
+                console.error('Error fetching subscriber count:', error);
+                subscriberCount.textContent = '?';
+            }
+        }
+
+        async function sendBroadcast(title, message) {
+            sendBtn.disabled = true;
+            sendBtn.textContent = '📤 Sending...';
+
+            try {
+                const payload = JSON.stringify({
+                    title: title,
+                    body: message,
+                    icon: 'https://via.placeholder.com/192x192.png?text=📢',
+                    badge: 'https://via.placeholder.com/96x96.png?text=🔔',
+                    vibrate: [200, 100, 200],
+                    requireInteraction: true
+                });
+
+                const response = await fetch('/api/broadcast', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ payload })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showStatus(
+                        `✅ Successfully sent to ${result.successCount} devices! ${result.failureCount > 0 ? `(${result.failureCount} failed)` : ''}`,
+                        'success'
+                    );
+                    
+                    // Add to history
+                    history.unshift({
+                        title,
+                        message,
+                        sent: result.successCount,
+                        failed: result.failureCount,
+                        time: new Date().toLocaleString()
+                    });
+                    updateHistory();
+                    
+                    // Clear form
+                    titleInput.value = '';
+                    messageInput.value = '';
+                    
+                    // Refresh count
+                    await refreshSubscriberCount();
+                } else {
+                    showStatus('❌ Error: ' + result.message, 'error');
+                }
+
+            } catch (error) {
+                console.error('Error sending broadcast:', error);
+                showStatus('❌ Error sending notification: ' + error.message, 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = '📤 Send to All Devices';
+            }
+        }
+
+        function updateHistory() {
+            if (history.length === 0) {
+                historyList.innerHTML = '<p class="help-text">No broadcasts sent yet</p>';
+                return;
+            }
+
+            historyList.innerHTML = history.slice(0, 5).map(item => `
+                <div class="history-item">
+                    <strong>${item.title}</strong><br>
+                    ${item.message}<br>
+                    <span class="history-time">
+                        ${item.time} • Sent to ${item.sent} device(s)
+                        ${item.failed > 0 ? `• ${item.failed} failed` : ''}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        broadcastForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = titleInput.value.trim();
+            const message = messageInput.value.trim();
+            
+            if (title && message) {
+                sendBroadcast(title, message);
+            }
+        });
+
+        refreshBtn.addEventListener('click', refreshSubscriberCount);
+
+        // Initial load
+        refreshSubscriberCount();
+        
+        // Auto-refresh count every 30 seconds
+        setInterval(refreshSubscriberCount, 30000);
+    </script>
+</body>
+</html>

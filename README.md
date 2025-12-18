@@ -8,6 +8,9 @@ A complete web push notification implementation with a modern UI, featuring serv
 ✅ Request browser notification permission  
 ✅ Subscribe to push notifications  
 ✅ Send push messages from the browser  
+✅ **Admin broadcast page at `/notifi` to send to ALL devices**  
+✅ **Notifications work even when browser is closed**  
+✅ **Text-to-speech announcements**  
 ✅ Display subscription details and VAPID keys  
 ✅ Generate CURL commands for testing  
 ✅ Support for aes128gcm and aesgcm content encoding  
@@ -47,6 +50,29 @@ http://localhost:3000
 3. Click the toggle to enable push notifications and grant permission when prompted
 
 4. Send test notifications using the "Send a Push Message" section
+
+## Admin Broadcast Page
+
+To send notifications to ALL subscribed devices at once:
+
+1. Navigate to:
+```
+http://localhost:3000/notifi
+```
+or on Vercel:
+```
+https://your-app.vercel.app/notifi
+```
+
+2. Enter a title and message
+3. Click "Send to All Devices"
+4. All subscribed phones/devices will receive the notification **even if Chrome is closed**
+
+💡 **How it works when browser is closed:**
+- Service workers run in the background
+- They listen for push events even when the browser/tab is closed
+- Notifications appear on the device instantly
+- Text-to-speech plays when user opens the browser
 
 ## Project Structure
 
