@@ -293,17 +293,20 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    showStatus(`✅ Order sent to ${result.successCount} kitchen device(s)!`, 'success');
-                    
-                    // Reset form
-                    orderForm.reset();
+                    if (result.successCount > 0) {
+                        showStatus(`✅ Order sent to ${result.successCount} kitchen device(s)!`, 'success');
+                        // Reset form
+                        orderForm.reset();
+                    } else {
+                        showStatus('⚠️ No kitchen devices are subscribed yet! Ask kitchen staff to enable notifications at the home page first.', 'error');
+                    }
                 } else {
-                    showStatus('❌ Error sending order: ' + result.message, 'error');
+                    showStatus('❌ Error sending order: ' + (result.message || 'Unknown error'), 'error');
                 }
 
             } catch (error) {
                 console.error('Error:', error);
-                showStatus('❌ Error sending order. Please try again.', 'error');
+                showStatus('❌ Error: Make sure kitchen staff have subscribed to notifications first! Visit home page (/) and enable notifications.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '🔔 Send Order to Kitchen';

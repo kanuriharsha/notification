@@ -231,7 +231,12 @@ app.post('/api/broadcast', async (req, res) => {
     const { payload } = req.body;
 
     if (subscriptions.length === 0) {
-        return res.status(400).send('No subscriptions available');
+        return res.status(200).json({
+            message: 'No subscriptions available',
+            successCount: 0,
+            failureCount: 0,
+            totalSubscriptions: 0
+        });
     }
 
     let notificationPayload;
