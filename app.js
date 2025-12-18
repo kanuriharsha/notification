@@ -59,6 +59,11 @@ async function initializeApp() {
         return;
     }
 
+    // Check if on HTTPS (required for service workers)
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        showStatus('⚠️ HTTPS is required for push notifications. This site must be accessed via HTTPS.', 'error');
+    }
+
     try {
         // Register service worker
         swRegistration = await navigator.serviceWorker.register('sw.js');
@@ -72,11 +77,19 @@ async function initializeApp() {
             console.log('User is already subscribed:', subscription);
             updateUI();
             updateSubscriptionDisplay(subscription);
+            showStatus('✅ You are subscribed! Notifications will work even when browser is closed.', 'success');
+        } else {
+            showStatus('👆 Click the toggle above to enable notifications for this device.', 'info');
         }
 
         // Update toggle state
         if (isSubscribed) {
             pushToggle.classList.add('active');
+        }
+
+        // Check notification permission
+        if (Notification.permission === 'denied') {
+            showStatus('⚠️ Notifications are blocked. Please enable them in your browser settings.', 'error');
         }
 
     } catch (error) {

@@ -237,6 +237,29 @@
         <!-- Enable Push Toggle -->
         <div class="card">
             <h2>Enable Push Notifications</h2>
+            
+            <!-- Important Setup Instructions -->
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                <strong>⚠️ Important Setup for Background Notifications:</strong>
+                <div style="margin-top: 10px; font-size: 14px; color: #856404;">
+                    <p style="margin-bottom: 10px;">For notifications to work <strong>even when phone is locked or Chrome is closed</strong>, you must:</p>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Allow notifications</strong> when prompted (click toggle below)</li>
+                        <li><strong>Enable background data for Chrome:</strong>
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li><strong>Android:</strong> Settings → Apps → Chrome → Mobile data & Wi-Fi → Enable "Allow background data"</li>
+                                <li><strong>iPhone:</strong> Settings → Chrome → Background App Refresh → ON</li>
+                            </ul>
+                        </li>
+                        <li><strong>Don't force-close Chrome</strong> (minimize instead)</li>
+                    </ol>
+                    <p style="margin-top: 10px; font-size: 13px;">✅ Once setup, notifications will arrive with <strong>sound + vibration</strong> even when locked!</p>
+                    <p style="margin-top: 10px;">
+                        <a href="/setup" style="color: #0066cc; text-decoration: underline; font-weight: 600;">📖 View Detailed Setup Guide →</a>
+                    </p>
+                </div>
+            </div>
+
             <div class="toggle-section">
                 <span class="toggle-label">Enable push notifications</span>
                 <div id="pushToggle" class="toggle-switch"></div>

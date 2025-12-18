@@ -311,6 +311,11 @@ app.get('/order', (req, res) => {
     res.sendFile(path.join(__dirname, 'order.html'));
 });
 
+// Serve the setup guide page
+app.get('/setup', (req, res) => {
+    res.sendFile(path.join(__dirname, 'setup.html'));
+});
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({

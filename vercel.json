@@ -18,6 +18,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "setup.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "app.js",
       "use": "@vercel/static"
     },
@@ -37,6 +41,10 @@
     },
     {
       "src": "/order",
+      "dest": "server.js"
+    },
+    {
+      "src": "/setup",
       "dest": "server.js"
     },
     {
