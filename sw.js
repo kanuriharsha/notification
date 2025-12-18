@@ -63,7 +63,6 @@ self.addEventListener('push', (event) => {
             tag: notificationData.tag,
             requireInteraction: notificationData.requireInteraction,
             vibrate: notificationData.vibrate,
-            silent: false,
             data: notificationData.data,
             actions: [
                 {
@@ -77,22 +76,15 @@ self.addEventListener('push', (event) => {
             ]
         }
     ).then(() => {
-        // Try to play text-to-speech in all open clients
+        // Send message to all clients to play text-to-speech
         return self.clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then((clientList) => {
-                if (clientList.length > 0) {
-                    // Browser has open tabs - send message to play TTS
-                    clientList.forEach((client) => {
-                        client.postMessage({
-                            type: 'PLAY_NOTIFICATION_SOUND',
-                            message: notificationData.body
-                        });
+                clientList.forEach((client) => {
+                    client.postMessage({
+                        type: 'PLAY_NOTIFICATION_SOUND',
+                        message: notificationData.body
                     });
-                } else {
-                    // No open tabs - notification will use OS default sound
-                    // When user clicks notification, it will open and speak
-                    console.log('No open tabs - OS will play default notification sound');
-                }
+                });
             });
     });
 
@@ -102,9 +94,6 @@ self.addEventListener('push', (event) => {
 // Handle notification click
 self.addEventListener('notificationclick', (event) => {
     console.log('Notification clicked:', event);
-    
-    const notificationData = event.notification.data || {};
-    const notificationBody = event.notification.body;
     
     event.notification.close();
 
@@ -117,20 +106,12 @@ self.addEventListener('notificationclick', (event) => {
                     for (let i = 0; i < clientList.length; i++) {
                         const client = clientList[i];
                         if (client.url.includes(self.location.origin) && 'focus' in client) {
-                            // Found an open window - focus it and speak the notification
-                            return client.focus().then(() => {
-                                // Send message to speak the order details
-                                client.postMessage({
-                                    type: 'SPEAK_ON_CLICK',
-                                    message: notificationBody
-                                });
-                                return client;
-                            });
+                            return client.focus();
                         }
                     }
                     // If no window is open, open a new one
                     if (clients.openWindow) {
-                        return clients.openWindow('/?notification=' + encodeURIComponent(notificationBody));
+                        return clients.openWindow('/');
                     }
                 })
         );

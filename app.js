@@ -362,28 +362,9 @@ function speakNotification(message) {
         // Cancel any ongoing speech
         window.speechSynthesis.cancel();
         
-        // Parse and enhance the message for better speech
-        let speechText = message;
-        
-        // Check if it's an order notification
-        if (message.includes('Biriyani') || message.includes('Rice') || message.includes('Manchuria') || 
-            message.includes('Chicken') || message.includes('Paneer') || /\d+\s+\w+/.test(message)) {
-            // It's an order - make it sound natural
-            speechText = `New order received. ${message}`;
-            
-            // Replace numbers with more natural speech
-            speechText = speechText.replace(/(\d+)\s+/g, '$1 plate of ');
-            
-            // Add pauses for better clarity
-            speechText = speechText.replace(/,/g, ', ... ');
-            speechText = speechText.replace(/\|/g, ' ... ');
-        } else {
-            speechText = `You have received notification. ${message}`;
-        }
-        
         const utterance = new SpeechSynthesisUtterance();
-        utterance.text = speechText;
-        utterance.rate = 0.9; // Slightly slower for clarity
+        utterance.text = `You have received notification. ${message}`;
+        utterance.rate = 1.0;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         utterance.lang = 'en-US';
@@ -394,14 +375,14 @@ function speakNotification(message) {
             if (voices.length > 0) {
                 // Try to find a good English voice
                 const preferredVoice = voices.find(voice => 
-                    voice.lang.startsWith('en') && (voice.name.includes('Female') || voice.name.includes('Google'))
+                    voice.lang.startsWith('en') && voice.name.includes('Female')
                 ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
                 
                 utterance.voice = preferredVoice;
             }
             
             window.speechSynthesis.speak(utterance);
-            console.log('Speaking notification:', speechText);
+            console.log('Speaking notification:', message);
         }, 100);
     } else {
         console.log('Speech synthesis not supported');
@@ -437,14 +418,6 @@ function playBeepSound() {
 navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'PLAY_NOTIFICATION_SOUND') {
         speakNotification(event.data.message);
-    } else if (event.data && event.data.type === 'SPEAK_ON_CLICK') {
-        // Notification was clicked - speak the order
-        setTimeout(() => {
-            speakNotification(event.data.message);
-        }, 500);
-    } else if (event.data && event.data.type === 'SUBSCRIPTION_UPDATED') {
-        // Subscription was updated - save to localStorage
-        localStorage.setItem('push-subscription', JSON.stringify(event.data.subscription));
     }
 });
 
@@ -492,18 +465,4 @@ document.addEventListener('visibilitychange', async () => {
 });
 
 // Initialize the app when the page loads
-window.addEventListener('load', () => {
-    initializeApp();
-    
-    // Check if opened from notification click
-    const urlParams = new URLSearchParams(window.location.search);
-    const notificationMessage = urlParams.get('notification');
-    if (notificationMessage) {
-        // Speak the notification after a short delay
-        setTimeout(() => {
-            speakNotification(decodeURIComponent(notificationMessage));
-            // Clean up URL
-            window.history.replaceState({}, document.title, '/');
-        }, 1000);
-    }
-});
+window.addEventListener('load', initializeApp);
