@@ -17,17 +17,29 @@ app.use(express.static(__dirname));
 let subscriptions = [];
 
 // VAPID keys configuration
-const vapidKeysFile = path.join(__dirname, 'vapid-keys.json');
 let vapidKeys;
 
-// Generate or load VAPID keys
-if (fs.existsSync(vapidKeysFile)) {
-    vapidKeys = JSON.parse(fs.readFileSync(vapidKeysFile, 'utf8'));
-    console.log('Loaded existing VAPID keys');
+// Use environment variables first, then try to load from file, or generate new ones
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    vapidKeys = {
+        publicKey: process.env.VAPID_PUBLIC_KEY,
+        privateKey: process.env.VAPID_PRIVATE_KEY
+    };
+    console.log('Loaded VAPID keys from environment variables');
 } else {
-    vapidKeys = webpush.generateVAPIDKeys();
-    fs.writeFileSync(vapidKeysFile, JSON.stringify(vapidKeys, null, 2));
-    console.log('Generated new VAPID keys');
+    const vapidKeysFile = path.join(__dirname, 'vapid-keys.json');
+    if (fs.existsSync(vapidKeysFile)) {
+        vapidKeys = JSON.parse(fs.readFileSync(vapidKeysFile, 'utf8'));
+        console.log('Loaded existing VAPID keys from file');
+    } else {
+        vapidKeys = webpush.generateVAPIDKeys();
+        try {
+            fs.writeFileSync(vapidKeysFile, JSON.stringify(vapidKeys, null, 2));
+            console.log('Generated new VAPID keys');
+        } catch (error) {
+            console.log('Generated new VAPID keys (file write skipped in serverless)');
+        }
+    }
 }
 
 // Configure web-push with VAPID details
