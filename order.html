@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Your Order</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #f5576c;
+            margin-bottom: 10px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #f5576c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #e04658;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .menu-items {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .menu-item-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .menu-item-qty {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="icon">🍽️</div>
+            <h1>Place Your Order</h1>
+            <p class="subtitle">Kitchen will be notified instantly</p>
+
+            <div id="statusMessage" class="status-message"></div>
+
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="tableNumber">Table Number / Name</label>
+                    <input type="text" id="tableNumber" placeholder="e.g., Table 5 or John" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Items & Quantity</label>
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <span class="menu-item-name">Chicken Biriyani</span>
+                            <input type="number" class="menu-item-qty" id="biriyani" min="0" value="0">
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Veg Fried Rice</span>
+                            <input type="number" class="menu-item-qty" id="friedrice" min="0" value="0">
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Gobi Manchuria</span>
+                            <input type="number" class="menu-item-qty" id="manchuria" min="0" value="0">
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Chicken 65</span>
+                            <input type="number" class="menu-item-qty" id="chicken65" min="0" value="0">
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Paneer Butter Masala</span>
+                            <input type="number" class="menu-item-qty" id="paneer" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialInstructions">Special Instructions (Optional)</label>
+                    <textarea id="specialInstructions" placeholder="e.g., Less spicy, Extra gravy..."></textarea>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn">🔔 Send Order to Kitchen</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const orderForm = document.getElementById('orderForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        orderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const tableNumber = document.getElementById('tableNumber').value.trim();
+            const specialInstructions = document.getElementById('specialInstructions').value.trim();
+
+            // Collect order items
+            const items = [];
+            const menuItems = {
+                'biriyani': 'Chicken Biriyani',
+                'friedrice': 'Veg Fried Rice',
+                'manchuria': 'Gobi Manchuria',
+                'chicken65': 'Chicken 65',
+                'paneer': 'Paneer Butter Masala'
+            };
+
+            for (let id in menuItems) {
+                const qty = parseInt(document.getElementById(id).value) || 0;
+                if (qty > 0) {
+                    items.push(`${qty} ${menuItems[id]}`);
+                }
+            }
+
+            if (items.length === 0) {
+                showStatus('Please select at least one item!', 'error');
+                return;
+            }
+
+            // Create order message
+            let orderMessage = items.join(', ');
+            if (specialInstructions) {
+                orderMessage += ` | Note: ${specialInstructions}`;
+            }
+
+            const title = `🔔 New Order - ${tableNumber}`;
+
+            // Send to kitchen
+            submitBtn.disabled = true;
+            submitBtn.textContent = '📤 Sending to Kitchen...';
+
+            try {
+                const payload = JSON.stringify({
+                    title: title,
+                    body: orderMessage,
+                    icon: 'https://via.placeholder.com/192x192.png?text=🍽️',
+                    badge: 'https://via.placeholder.com/96x96.png?text=🔔',
+                    vibrate: [300, 100, 300, 100, 300, 100, 300],
+                    requireInteraction: true,
+                    silent: false,
+                    renotify: true,
+                    tag: 'order-' + Date.now()
+                });
+
+                const response = await fetch('/api/broadcast', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ payload })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showStatus(`✅ Order sent to ${result.successCount} kitchen device(s)!`, 'success');
+                    
+                    // Reset form
+                    orderForm.reset();
+                } else {
+                    showStatus('❌ Error sending order: ' + result.message, 'error');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error sending order. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🔔 Send Order to Kitchen';
+            }
+        });
+    </script>
+</body>
+</html>

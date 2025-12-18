@@ -301,6 +301,11 @@ app.get('/notifi', (req, res) => {
     res.sendFile(path.join(__dirname, 'notifi.html'));
 });
 
+// Serve the customer order page
+app.get('/order', (req, res) => {
+    res.sendFile(path.join(__dirname, 'order.html'));
+});
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({

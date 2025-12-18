@@ -19,9 +19,11 @@ self.addEventListener('push', (event) => {
         body: 'You have a new message!',
         icon: 'https://via.placeholder.com/192x192.png?text=📬',
         badge: 'https://via.placeholder.com/96x96.png?text=🔔',
-        tag: 'push-notification',
-        requireInteraction: false,
-        vibrate: [200, 100, 200],
+        tag: 'push-notification-' + Date.now(),
+        requireInteraction: true,
+        vibrate: [300, 100, 300, 100, 300, 100, 300],
+        silent: false,
+        renotify: true,
         data: {
             timestamp: Date.now()
         }

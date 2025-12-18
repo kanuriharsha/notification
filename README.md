@@ -1,21 +1,20 @@
 # Push Notification Demo
 
-A complete web push notification implementation with a modern UI, featuring service workers, VAPID authentication, and a Node.js backend.
+A complete web push notification implementation designed for **restaurants, hotels, and food delivery**. Features real-time order notifications that work even when the browser is closed, with automatic sound alerts and vibration.
 
 ## Features
 
+✅ **Restaurant order notifications with sound** (works when browser is closed)  
+✅ **Strong vibration alerts** for instant attention  
+✅ **Customer order page** at `/order` with menu selection  
+✅ **Kitchen broadcast page** at `/notifi` to send to all devices  
 ✅ Enable/disable push notifications with toggle switch  
-✅ Request browser notification permission  
 ✅ Subscribe to push notifications  
-✅ Send push messages from the browser  
-✅ **Admin broadcast page at `/notifi` to send to ALL devices**  
-✅ **Notifications work even when browser is closed**  
-✅ **Text-to-speech announcements**  
+✅ **Notifications work even when browser/phone is closed**  
+✅ **Text-to-speech announcements** (when browser is open)  
 ✅ Display subscription details and VAPID keys  
-✅ Generate CURL commands for testing  
-✅ Support for aes128gcm and aesgcm content encoding  
-✅ Beautiful, responsive UI with gradient design  
-✅ Backend API for managing subscriptions and sending notifications
+✅ Beautiful, responsive UI  
+✅ Backend API for managing subscriptions
 
 ## Prerequisites
 
@@ -65,14 +64,47 @@ https://your-app.vercel.app/notifi
 ```
 
 2. Enter a title and message
-3. Click "Send to All Devices"
+3. Click "Send Order to Kitchen"
 4. All subscribed phones/devices will receive the notification **even if Chrome is closed**
 
-💡 **How it works when browser is closed:**
-- Service workers run in the background
-- They listen for push events even when the browser/tab is closed
-- Notifications appear on the device instantly
-- Text-to-speech plays when user opens the browser
+## Customer Order Page
+
+For customers to place orders:
+
+1. Navigate to:
+```
+http://localhost:3000/order
+```
+or on Vercel:
+```
+https://your-app.vercel.app/order
+```
+
+2. Enter table number
+3. Select menu items and quantities
+4. Add special instructions (optional)
+5. Click "Send Order to Kitchen"
+
+## 🔔 How It Works (Even When Browser is Closed)
+
+### **Notifications WITH Sound:**
+- ✅ **Device notification sound** plays automatically (managed by OS)
+- ✅ **Strong vibration pattern** (300ms x 4 times)
+- ✅ **Notification stays on screen** until dismissed
+- ✅ **Works when Chrome is completely closed**
+- ✅ **Works when phone screen is locked**
+
+### **Text-to-Speech:**
+- 🔊 Plays when user opens the browser
+- 📱 Announces: "You have received notification [message]"
+
+### **Perfect for Restaurant Use:**
+```
+Kitchen staff subscribes → Orders come in → 
+Phone vibrates + notification sound plays → 
+Notification shows: "New Order - Table 5: 1 Biriyani, 2 Fried Rice"
+→ Even if phone is in pocket or Chrome is closed!
+```
 
 ## Project Structure
 

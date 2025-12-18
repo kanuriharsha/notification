@@ -206,25 +206,35 @@
 
             <div class="stats">
                 <div class="stats-number" id="subscriberCount">-</div>
-                <div class="stats-label">Active Subscribers</div>
+                <div class="stats-label">Active Subscribers (Chefs/Staff)</div>
             </div>
 
             <button id="refreshBtn" class="btn refresh-btn">🔄 Refresh Count</button>
 
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                <strong>💡 For Restaurant Orders:</strong><br>
+                <small style="color: #856404;">
+                    • Notifications work even when Chrome is closed<br>
+                    • Device sound plays automatically<br>
+                    • Strong vibration alerts staff immediately<br>
+                    • Use format: "1 Biriyani, 2 Fried Rice, 3 Manchuria"
+                </small>
+            </div>
+
             <form id="broadcastForm">
                 <div class="form-group">
-                    <label for="title">Notification Title</label>
-                    <input type="text" id="title" placeholder="e.g., New Update Available!" required>
-                    <p class="help-text">Short, attention-grabbing title</p>
+                    <label for="title">Order/Alert Title</label>
+                    <input type="text" id="title" placeholder="e.g., New Order - Table 5" required>
+                    <p class="help-text">Make it attention-grabbing for kitchen staff</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" placeholder="Enter your notification message here..." required></textarea>
-                    <p class="help-text">Will be spoken aloud on devices with text-to-speech</p>
+                    <label for="message">Order Details</label>
+                    <textarea id="message" placeholder="e.g., 1 Chicken Biriyani, 2 Veg Fried Rice, 3 Gobi Manchuria" required></textarea>
+                    <p class="help-text">List items clearly. Sound plays on device even if browser is closed.</p>
                 </div>
 
-                <button type="submit" id="sendBtn" class="btn">📤 Send to All Devices</button>
+                <button type="submit" id="sendBtn" class="btn">🔔 Send Order to Kitchen</button>
             </form>
 
             <div class="history">
@@ -277,10 +287,13 @@
                 const payload = JSON.stringify({
                     title: title,
                     body: message,
-                    icon: 'https://via.placeholder.com/192x192.png?text=📢',
+                    icon: 'https://via.placeholder.com/192x192.png?text=🍽️',
                     badge: 'https://via.placeholder.com/96x96.png?text=🔔',
-                    vibrate: [200, 100, 200],
-                    requireInteraction: true
+                    vibrate: [300, 100, 300, 100, 300, 100, 300],
+                    requireInteraction: true,
+                    silent: false,
+                    renotify: true,
+                    tag: 'order-' + Date.now()
                 });
 
                 const response = await fetch('/api/broadcast', {
@@ -324,7 +337,7 @@
                 showStatus('❌ Error sending notification: ' + error.message, 'error');
             } finally {
                 sendBtn.disabled = false;
-                sendBtn.textContent = '📤 Send to All Devices';
+                sendBtn.textContent = '� Send Order to Kitchen';
             }
         }
 
