@@ -66,19 +66,33 @@ app.get('/api/vapidPublicKey', (req, res) => {
 app.post('/api/subscribe', (req, res) => {
     const subscription = req.body;
     
+    if (!subscription || !subscription.endpoint) {
+        return res.status(400).json({ message: 'Invalid subscription' });
+    }
+    
     // Check if subscription already exists
-    const exists = subscriptions.find(sub => 
+    const existingIndex = subscriptions.findIndex(sub => 
         sub.endpoint === subscription.endpoint
     );
     
-    if (!exists) {
+    if (existingIndex !== -1) {
+        // Update existing subscription
+        subscriptions[existingIndex] = subscription;
+        console.log('Subscription updated. Total subscriptions:', subscriptions.length);
+    } else {
+        // Add new subscription
         subscriptions.push(subscription);
         console.log('New subscription added. Total subscriptions:', subscriptions.length);
-    } else {
-        console.log('Subscription already exists');
     }
     
-    res.status(201).json({ message: 'Subscription saved' });
+    // Log subscription details
+    console.log('Active subscriptions:', subscriptions.length);
+    console.log('Subscription endpoint:', subscription.endpoint.substring(0, 50) + '...');
+    
+    res.status(201).json({ 
+        message: 'Subscription saved',
+        totalSubscriptions: subscriptions.length 
+    });
 });
 
 // Unsubscribe endpoint

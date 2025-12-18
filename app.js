@@ -75,11 +75,41 @@ async function initializeApp() {
 
         if (isSubscribed) {
             console.log('User is already subscribed:', subscription);
+            
+            // Re-register with server (in case server restarted)
+            try {
+                await fetch(`${SERVER_URL}/api/subscribe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(subscription)
+                });
+                console.log('Re-registered subscription with server');
+            } catch (error) {
+                console.error('Error re-registering subscription:', error);
+            }
+            
+            // Update localStorage
+            localStorage.setItem('push-subscription', JSON.stringify(subscription));
+            localStorage.setItem('push-enabled', 'true');
+            
             updateUI();
             updateSubscriptionDisplay(subscription);
             showStatus('✅ You are subscribed! Notifications will work even when browser is closed.', 'success');
         } else {
-            showStatus('👆 Click the toggle above to enable notifications for this device.', 'info');
+            // Check if user was previously subscribed
+            const wasEnabled = localStorage.getItem('push-enabled') === 'true';
+            if (wasEnabled && Notification.permission === 'granted') {
+                showStatus('🔄 Restoring your subscription...', 'info');
+                // Auto-resubscribe
+                setTimeout(async () => {
+                    pushToggle.classList.add('active');
+                    await subscribeUser();
+                }, 1000);
+            } else {
+                showStatus('👆 Click the toggle above to enable notifications for this device.', 'info');
+            }
         }
 
         // Update toggle state
@@ -124,7 +154,7 @@ async function subscribeUser() {
         console.log('User subscribed:', subscription);
 
         // Send subscription to server
-        await fetch(`${SERVER_URL}/api/subscribe`, {
+        const subscribeResponse = await fetch(`${SERVER_URL}/api/subscribe`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -132,10 +162,19 @@ async function subscribeUser() {
             body: JSON.stringify(subscription)
         });
 
+        if (!subscribeResponse.ok) {
+            throw new Error('Failed to save subscription on server');
+        }
+
+        // Store subscription in localStorage for persistence
+        localStorage.setItem('push-subscription', JSON.stringify(subscription));
+        localStorage.setItem('push-enabled', 'true');
+        console.log('Subscription saved to localStorage');
+
         isSubscribed = true;
         updateUI();
         updateSubscriptionDisplay(subscription);
-        showStatus('Successfully subscribed to push notifications!', 'success');
+        showStatus('✅ Successfully subscribed! Notifications will work even when browser is closed.', 'success');
 
     } catch (error) {
         console.error('Error subscribing:', error);
@@ -163,6 +202,11 @@ async function unsubscribeUser() {
 
             console.log('User unsubscribed');
         }
+
+        // Clear localStorage
+        localStorage.removeItem('push-subscription');
+        localStorage.setItem('push-enabled', 'false');
+        console.log('Subscription removed from localStorage');
 
         isSubscribed = false;
         updateUI();
@@ -374,6 +418,49 @@ function playBeepSound() {
 navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'PLAY_NOTIFICATION_SOUND') {
         speakNotification(event.data.message);
+    }
+});
+
+// Periodic re-registration to keep subscription alive (every 5 minutes)
+setInterval(async () => {
+    if (isSubscribed && swRegistration) {
+        try {
+            const subscription = await swRegistration.pushManager.getSubscription();
+            if (subscription) {
+                // Re-register with server
+                await fetch(`${SERVER_URL}/api/subscribe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(subscription)
+                });
+                console.log('Subscription refreshed with server');
+            }
+        } catch (error) {
+            console.error('Error refreshing subscription:', error);
+        }
+    }
+}, 5 * 60 * 1000); // Every 5 minutes
+
+// Re-register when page becomes visible (user returns to tab)
+document.addEventListener('visibilitychange', async () => {
+    if (!document.hidden && isSubscribed && swRegistration) {
+        try {
+            const subscription = await swRegistration.pushManager.getSubscription();
+            if (subscription) {
+                await fetch(`${SERVER_URL}/api/subscribe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(subscription)
+                });
+                console.log('Subscription re-registered on page visibility');
+            }
+        } catch (error) {
+            console.error('Error re-registering on visibility:', error);
+        }
     }
 });
 

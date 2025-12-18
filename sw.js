@@ -130,17 +130,38 @@ self.addEventListener('pushsubscriptionchange', (event) => {
     event.waitUntil(
         self.registration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: event.oldSubscription.options.applicationServerKey
+            applicationServerKey: event.oldSubscription ? event.oldSubscription.options.applicationServerKey : null
         }).then((subscription) => {
             console.log('Resubscribed to push notifications:', subscription);
+            
             // Send the new subscription to the server
-            return fetch('/api/subscription', {
+            return fetch('/api/subscribe', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(subscription)
+            }).then(() => {
+                // Notify all clients about the new subscription
+                return self.clients.matchAll({ includeUncontrolled: true })
+                    .then((clientList) => {
+                        clientList.forEach((client) => {
+                            client.postMessage({
+                                type: 'SUBSCRIPTION_UPDATED',
+                                subscription: subscription
+                            });
+                        });
+                    });
             });
+        }).catch((error) => {
+            console.error('Failed to resubscribe:', error);
         })
     );
+});
+
+// Keep service worker alive
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'KEEP_ALIVE') {
+        event.ports[0].postMessage({ ok: true });
+    }
 });
