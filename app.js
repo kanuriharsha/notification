@@ -362,6 +362,9 @@ function speakNotification(message) {
         // Cancel any ongoing speech
         window.speechSynthesis.cancel();
         
+        // Get volume from settings
+        const volume = parseInt(localStorage.getItem('voice-volume') || '100') / 100;
+        
         // Parse and enhance the message for better speech
         let speechText = message;
         
@@ -385,7 +388,7 @@ function speakNotification(message) {
         utterance.text = speechText;
         utterance.rate = 0.9; // Slightly slower for clarity
         utterance.pitch = 1.0;
-        utterance.volume = 1.0;
+        utterance.volume = volume;
         utterance.lang = 'en-US';
         
         // Wait a bit for voices to load

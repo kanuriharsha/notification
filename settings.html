@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .setting-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .setting-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 32px;
+        }
+
+        .setting-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #155724;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.active {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.inactive {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #audioStatus {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="icon">⚙️</div>
+            <h1>Notification Settings</h1>
+            <p class="subtitle">Configure how you receive order notifications</p>
+
+            <!-- Background Audio Setting -->
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-title">🔊 Background Custom Sound</div>
+                    <div id="bgAudioToggle" class="toggle-switch"></div>
+                </div>
+                <div class="setting-desc">
+                    Enable custom voice announcements even when browser is minimized (not closed).
+                    When enabled, you'll hear "New order received, 1 plate of Biriyani..." instead of just phone notification sound.
+                </div>
+                <div id="audioStatus" style="display: none;">
+                    <span class="status-indicator active"></span>
+                    <strong>Audio Context Active</strong> - Custom sounds will play when browser is minimized
+                </div>
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong><br>
+                    • This keeps a silent audio running to enable custom sounds<br>
+                    • Works when browser is <strong>minimized</strong> (not completely closed)<br>
+                    • May use slightly more battery<br>
+                    • Browser must stay in background (don't force-close)<br>
+                    • If browser is completely closed, device notification sound plays instead
+                </div>
+            </div>
+
+            <!-- Test Sound -->
+            <div class="setting-item">
+                <div class="setting-title" style="margin-bottom: 15px;">🎵 Test Custom Sound</div>
+                <div class="setting-desc" style="margin-bottom: 15px;">
+                    Test how the custom voice announcement sounds. This simulates an order notification.
+                </div>
+                <button id="testSoundBtn" class="btn">▶️ Test Sound: "1 Biriyani, 2 Fried Rice"</button>
+            </div>
+
+            <!-- Sound Volume -->
+            <div class="setting-item">
+                <div class="setting-title" style="margin-bottom: 15px;">🔉 Voice Volume</div>
+                <div class="setting-desc" style="margin-bottom: 15px;">
+                    Adjust the volume of voice announcements (does not affect notification sound)
+                </div>
+                <input type="range" id="volumeSlider" min="0" max="100" value="100" style="width: 100%; margin-bottom: 10px;">
+                <div style="text-align: center; font-size: 14px; color: #666;">
+                    <span id="volumeValue">100</span>%
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="success-box">
+                <strong>✅ How It Works:</strong><br>
+                When background audio is enabled, the app keeps a silent audio stream active. 
+                This allows custom sounds to play when you receive notifications, even when the browser is in the background. 
+                You'll hear clear voice announcements like "New order received, 1 plate of Chicken Biriyani".
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="/" class="btn">🏠 Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <audio id="silentAudio" loop>
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" type="audio/wav">
+    </audio>
+
+    <script>
+        const bgAudioToggle = document.getElementById('bgAudioToggle');
+        const audioStatus = document.getElementById('audioStatus');
+        const testSoundBtn = document.getElementById('testSoundBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const silentAudio = document.getElementById('silentAudio');
+
+        let audioContext = null;
+        let isBackgroundAudioEnabled = false;
+
+        // Load settings
+        function loadSettings() {
+            const bgAudioEnabled = localStorage.getItem('bg-audio-enabled') === 'true';
+            const volume = parseInt(localStorage.getItem('voice-volume') || '100');
+            
+            isBackgroundAudioEnabled = bgAudioEnabled;
+            if (bgAudioEnabled) {
+                bgAudioToggle.classList.add('active');
+                startBackgroundAudio();
+            }
+            
+            volumeSlider.value = volume;
+            volumeValue.textContent = volume;
+        }
+
+        // Start background audio
+        async function startBackgroundAudio() {
+            try {
+                // Play silent audio
+                silentAudio.volume = 0.01; // Very low volume
+                await silentAudio.play();
+                
+                // Create audio context
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Resume if suspended
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                audioStatus.style.display = 'block';
+                console.log('Background audio started - custom sounds enabled');
+                
+                // Keep audio context alive
+                keepAudioContextAlive();
+                
+            } catch (error) {
+                console.error('Error starting background audio:', error);
+                alert('Please interact with the page first (click anywhere) to enable background audio');
+            }
+        }
+
+        // Stop background audio
+        function stopBackgroundAudio() {
+            if (silentAudio) {
+                silentAudio.pause();
+                silentAudio.currentTime = 0;
+            }
+            audioStatus.style.display = 'none';
+            console.log('Background audio stopped');
+        }
+
+        // Keep audio context alive by playing silent tone periodically
+        function keepAudioContextAlive() {
+            if (!isBackgroundAudioEnabled || !audioContext) return;
+            
+            setInterval(() => {
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+            }, 5000);
+        }
+
+        // Text-to-speech function
+        function speakOrder(message) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const volume = parseInt(volumeSlider.value) / 100;
+                let speechText = `New order received. ${message}`;
+                speechText = speechText.replace(/(\d+)\s+/g, '$1 plate of ');
+                speechText = speechText.replace(/,/g, ', ... ');
+                
+                const utterance = new SpeechSynthesisUtterance();
+                utterance.text = speechText;
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = volume;
+                utterance.lang = 'en-US';
+                
+                setTimeout(() => {
+                    const voices = window.speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        const preferredVoice = voices.find(voice => 
+                            voice.lang.startsWith('en') && (voice.name.includes('Female') || voice.name.includes('Google'))
+                        ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+                        utterance.voice = preferredVoice;
+                    }
+                    window.speechSynthesis.speak(utterance);
+                }, 100);
+            }
+        }
+
+        // Toggle background audio
+        bgAudioToggle.addEventListener('click', async () => {
+            isBackgroundAudioEnabled = !isBackgroundAudioEnabled;
+            
+            if (isBackgroundAudioEnabled) {
+                bgAudioToggle.classList.add('active');
+                localStorage.setItem('bg-audio-enabled', 'true');
+                await startBackgroundAudio();
+            } else {
+                bgAudioToggle.classList.remove('active');
+                localStorage.setItem('bg-audio-enabled', 'false');
+                stopBackgroundAudio();
+            }
+        });
+
+        // Test sound
+        testSoundBtn.addEventListener('click', () => {
+            speakOrder('1 Chicken Biriyani, 2 Veg Fried Rice');
+        });
+
+        // Volume slider
+        volumeSlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            volumeValue.textContent = value;
+            localStorage.setItem('voice-volume', value);
+        });
+
+        // Keep page alive when in background
+        document.addEventListener('visibilitychange', async () => {
+            if (!document.hidden && isBackgroundAudioEnabled && audioContext) {
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                if (silentAudio.paused) {
+                    await silentAudio.play();
+                }
+            }
+        });
+
+        // Load voices
+        if ('speechSynthesis' in window) {
+            speechSynthesis.addEventListener('voiceschanged', () => {
+                console.log('Voices loaded:', speechSynthesis.getVoices().length);
+            });
+        }
+
+        // Initialize
+        loadSettings();
+    </script>
+</body>
+</html>
