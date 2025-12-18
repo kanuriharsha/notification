@@ -330,11 +330,6 @@ app.get('/setup', (req, res) => {
     res.sendFile(path.join(__dirname, 'setup.html'));
 });
 
-// Serve the settings page
-app.get('/settings', (req, res) => {
-    res.sendFile(path.join(__dirname, 'settings.html'));
-});
-
 // Health check
 app.get('/health', (req, res) => {
     res.json({

@@ -22,10 +22,6 @@
       "use": "@vercel/static"
     },
     {
-      "src": "settings.html",
-      "use": "@vercel/static"
-    },
-    {
       "src": "app.js",
       "use": "@vercel/static"
     },
@@ -49,10 +45,6 @@
     },
     {
       "src": "/setup",
-      "dest": "server.js"
-    },
-    {
-      "src": "/settings",
       "dest": "server.js"
     },
     {
